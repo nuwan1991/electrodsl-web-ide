@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ElectroDSL — AI-Powered Electrical Schematic Editor</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="src/style.css">
+</head>
+<body>
+<div id="app">
+
+  <!-- ── Header ── -->
+  <header id="header">
+    <div class="header-left">
+      <div class="logo">
+        <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
+          <circle cx="11" cy="11" r="10" stroke="#60A5FA" stroke-width="1.5"/>
+          <path d="M7 11h2m6 0h-2m-2-4v2m0 4v2" stroke="#60A5FA" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="11" cy="11" r="2" fill="#60A5FA"/>
+        </svg>
+        <span class="logo-text">ElectroDSL</span>
+      </div>
+      <div id="file-title">
+        <span id="file-title-name">untitled</span>
+        <span class="dirty-dot hidden" id="dirty-dot" title="Unsaved changes"></span>
+      </div>
+      <div class="header-badges">
+        <span class="badge">v2.0</span>
+        <span class="badge badge-ai">AI-Powered</span>
+        <span class="badge badge-nets">Net-Aware</span>
+      </div>
+    </div>
+    <div class="header-right">
+      <button class="hbtn" id="btn-new">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+        New
+      </button>
+      <button class="hbtn" id="btn-open">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h3l2 2h4A1.5 1.5 0 0 1 14 6.5v6A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-8z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+        Open
+      </button>
+      <button class="hbtn" id="btn-save">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 2v4h6V2M5 9h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Save
+      </button>
+      <button class="hbtn" id="btn-save-as">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M3 2h8l3 3v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M5 2v4h6V2M5 9h6" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><text x="10" y="15" font-size="6" fill="currentColor" font-family="monospace">A</text></svg>
+        Save As
+      </button>
+      <div class="hbtn-sep"></div>
+      <button class="hbtn" id="btn-recent" title="Recent projects">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="6" stroke="currentColor" stroke-width="1.3"/><path d="M8 5v3.5l2.5 1.5" stroke="currentColor" stroke-width="1.3" stroke-linecap="round"/></svg>
+        Recent
+      </button>
+      <div class="hbtn-sep"></div>
+      <button class="hbtn" id="btn-export-svg">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        SVG
+      </button>
+      <button class="hbtn" id="btn-export-pdf">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="1" width="10" height="13" rx="1.5" stroke="currentColor" stroke-width="1.3"/><path d="M5 5h6M5 8h4M5 11h3" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/><path d="M10 1v4h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        PDF
+      </button>
+      <button class="hbtn" id="btn-export-spice">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="10" rx="1.5" stroke="currentColor" stroke-width="1.5"/><path d="M5 7h6M5 10h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+        SPICE
+      </button>
+      <button class="hbtn" id="btn-show-nets">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><circle cx="8" cy="8" r="5" stroke="#34D399" stroke-width="1.5"/><path d="M5 8h6M8 5v6" stroke="#34D399" stroke-width="1.2" stroke-linecap="round"/></svg>
+        Nets
+      </button>
+      <button class="hbtn hbtn-primary" id="btn-render">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M5 3l8 5-8 5V3z" fill="currentColor"/></svg>
+        Render
+      </button>
+    </div>
+  </header>
+
+  <!-- ── Recent Projects Dropdown ── -->
+  <div id="recent-dropdown" class="hidden">
+    <div class="recent-header">
+      <span>Recent Projects</span>
+      <button id="btn-clear-recent" class="recent-clear-btn">Clear all</button>
+    </div>
+    <div id="recent-list"></div>
+    <div id="recent-empty" class="recent-empty hidden">No recent projects yet.<br>Save a circuit to see it here.</div>
+  </div>
+
+  <!-- ── AI Bar ── -->
+  <div id="ai-bar">
+    <div class="ai-icon">
+      <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><path d="M8 2a1 1 0 0 1 1 1v1.268l1.098-.634a1 1 0 1 1 1 1.732L10 6l1.098.634a1 1 0 1 1-1 1.732L9 7.732V9a1 1 0 1 1-2 0V7.732L5.902 8.366a1 1 0 0 1-1-1.732L6 6 4.902 5.366a1 1 0 0 1 1-1.732L7 4.268V3a1 1 0 0 1 1-1z" fill="#60A5FA"/><path d="M5 11h6M6 13h4" stroke="#60A5FA" stroke-width="1.2" stroke-linecap="round"/></svg>
+    </div>
+    <input id="ai-input" type="text" placeholder="Describe a circuit… e.g. 'NPN amplifier with 12V supply and LED indicator'" autocomplete="off"/>
+    <button id="ai-generate-btn">Generate with AI ↗</button>
+    <div id="ai-status" class="ai-status"></div>
+  </div>
+
+  <!-- ── Main 3-column layout ── -->
+  <div id="main">
+
+    <!-- ══ LEFT: Symbol Library Panel ══ -->
+    <aside id="palette">
+
+      <!-- Tab bar -->
+      <div class="palette-tabs">
+        <button class="ptab active" data-tab="components">Components</button>
+        <button class="ptab" data-tab="library">Library</button>
+        <button class="ptab" data-tab="examples">Examples</button>
+      </div>
+
+      <!-- Tab: Components (built-in palette) -->
+      <div class="ptab-content active" id="tab-components">
+        <div class="palette-search-row">
+          <input id="palette-search" class="palette-search" placeholder="Search components…" autocomplete="off"/>
+        </div>
+        <div id="palette-built-in"></div>
+      </div>
+
+      <!-- Tab: Library (custom + all symbols) -->
+      <div class="ptab-content" id="tab-library">
+        <div class="lib-toolbar">
+          <button class="lib-btn" id="btn-import-sym">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Import JSON
+          </button>
+          <button class="lib-btn" id="btn-add-sym">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+            New Symbol
+          </button>
+          <button class="lib-btn" id="btn-export-lib">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M8 2v8m0 0L5 7m3 3l3-3M3 13h10" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Export
+          </button>
+        </div>
+        <div id="lib-symbol-list"></div>
+      </div>
+
+      <!-- Tab: Examples -->
+      <div class="ptab-content" id="tab-examples">
+        <div class="example-list">
+          <button class="example-btn" data-example="rc">RC Low-Pass Filter</button>
+          <button class="example-btn" data-example="divider">Voltage Divider</button>
+          <button class="example-btn" data-example="bridge">Bridge Rectifier</button>
+          <button class="example-btn" data-example="amplifier">BJT Amplifier</button>
+          <button class="example-btn" data-example="opamp">Inverting Op-Amp</button>
+          <button class="example-btn" data-example="555timer">555 Timer Astable</button>
+          <button class="example-btn" data-example="pwm">MOSFET Switch</button>
+          <button class="example-btn" data-example="lc">LC Resonator</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ══ CENTER: Code Editor ══ -->
+    <div id="editor-pane">
+      <div class="pane-header">
+        <span class="pane-title">DSL Code</span>
+        <div class="pane-actions">
+          <span id="cursor-pos" class="meta-info">Ln 1, Col 1</span>
+          <span id="component-count" class="meta-info">—</span>
+          <button class="small-btn" id="btn-format">Format</button>
+          <button class="small-btn" id="btn-preview-toggle" title="Toggle syntax preview panel">Preview</button>
+          <button class="small-btn" id="btn-copy-code">Copy</button>
+        </div>
+      </div>
+
+      <!-- Editor body: gutter | textarea -->
+      <div id="editor-body">
+        <div id="code-gutter"></div>
+        <textarea id="code-editor"
+          spellcheck="false" autocomplete="off"
+          autocorrect="off" autocapitalize="off"
+          placeholder="// Type DSL here or load an example..."></textarea>
+      </div>
+
+      <!-- Syntax preview panel (toggled) -->
+      <!-- injected by editor.js as #code-preview-panel -->
+
+      <div id="error-panel" class="hidden"><span id="error-msg"></span></div>
+    </div>
+
+    <!-- ══ RIGHT: Canvas ══ -->
+    <div id="canvas-pane">
+      <div class="pane-header">
+        <span class="pane-title">Schematic</span>
+        <div class="pane-actions">
+          <button class="small-btn" id="btn-zoom-in">+</button>
+          <span id="zoom-level" class="meta-info">100%</span>
+          <button class="small-btn" id="btn-zoom-out">−</button>
+          <button class="small-btn" id="btn-zoom-fit">Fit</button>
+          <div class="pane-sep"></div>
+          <span class="meta-info" style="color:var(--text3)">Scale:</span>
+          <select id="grid-scale-select" class="grid-select" title="Grid cell size (pixels per DSL unit)">
+            <option value="40">×0.5</option>
+            <option value="60">×0.75</option>
+            <option value="80" selected>×1</option>
+            <option value="100">×1.25</option>
+            <option value="120">×1.5</option>
+            <option value="160">×2</option>
+          </select>
+          <span class="meta-info" style="color:var(--text3)">Sub:</span>
+          <select id="grid-sub-select" class="grid-select" title="Subdivisions per grid cell (snap resolution)">
+            <option value="1" selected>1</option>
+            <option value="2">2</option>
+            <option value="4">4</option>
+            <option value="8">8</option>
+          </select>
+          <div class="pane-sep"></div>
+          <button class="small-btn active" id="btn-pin-toggle">Pins #</button>
+          <button class="small-btn active" id="btn-grid-toggle">Grid</button>
+          <div class="pane-sep"></div>
+          <label class="bg-color-label" title="Schematic background colour">
+            <span class="meta-info">BG</span>
+            <input type="color" id="schematic-bg-color" value="#0D1117" title="Schematic background colour"/>
+          </label>
+        </div>
+      </div>
+
+      <!-- Drop zone overlay (shown when dragging a component) -->
+      <div id="drop-overlay" class="hidden">
+        <div class="drop-hint">Drop to place component</div>
+      </div>
+
+      <!-- Tool Palette -->
+      <div id="tool-palette">
+        <button class="tool-btn active" data-tool="select" title="Select &amp; Move (V)">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 2l10 5.5-5 1.5-2 5.5L3 2z" stroke="currentColor" stroke-width="1.4" fill="none" stroke-linejoin="round"/>
+          </svg>
+          <span>Select</span>
+        </button>
+
+        <button class="tool-btn" data-tool="wire" title="Draw Wire (W) — click pin to start, click empty space for bend point, click target pin to finish">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <circle cx="3"  cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+            <circle cx="13" cy="8" r="2" stroke="currentColor" stroke-width="1.3"/>
+            <path d="M5 8h2v-3h2v6h2v-3" stroke="currentColor" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Wire</span>
+        </button>
+
+        <button class="tool-btn" data-tool="join" title="Join / Split Wire (J) — click on a wire to insert a junction node">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <line x1="2"  y1="8" x2="14" y2="8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <line x1="8"  y1="2" x2="8"  y2="14" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <circle cx="8" cy="8" r="2.5" fill="currentColor"/>
+          </svg>
+          <span>Join</span>
+        </button>
+
+        <div class="tool-sep"></div>
+
+        <button class="tool-btn" data-tool="rotate" title="Rotate (R) — click component to rotate 90°">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M13 8A5 5 0 1 1 8 3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>
+            <path d="M8 1l2.5 2L8 5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Rotate</span>
+        </button>
+
+        <button class="tool-btn" data-tool="delete-wire" title="Delete Wire (E) — click a wire to remove it">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M2 8h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+            <path d="M10 5l3 3-3 3" stroke="#F87171" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/>
+            <line x1="6" y1="5" x2="6" y2="11" stroke="#F87171" stroke-width="1.3" stroke-linecap="round"/>
+          </svg>
+          <span>Del Wire</span>
+        </button>
+
+        <button class="tool-btn" data-tool="delete" title="Delete Component (D) — click a component to delete it and its wires">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M3 4h10M6 4V3h4v1M5 4l.5 9h5l.5-9" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <span>Delete</span>
+        </button>
+
+        <div class="tool-sep"></div>
+        <div class="tool-hint" id="tool-hint">Select &amp; drag to move</div>
+      </div>
+
+      <div id="canvas-wrapper">
+        <div id="canvas-inner">
+          <svg id="schematic-svg" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <!-- Main grid (updated dynamically) -->
+              <pattern id="grid-pattern" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path d="M 80 0 L 0 0 0 80" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="0.5"/>
+              </pattern>
+              <!-- Sub-grid (updated dynamically) -->
+              <pattern id="subgrid-pattern" width="80" height="80" patternUnits="userSpaceOnUse">
+                <path id="subgrid-path" d="" fill="none" stroke="rgba(255,255,255,0.015)" stroke-width="0.3"/>
+              </pattern>
+            </defs>
+            <rect id="grid-bg"    width="2400" height="1600" fill="url(#grid-pattern)"/>
+            <rect id="subgrid-bg" width="2400" height="1600" fill="url(#subgrid-pattern)"/>
+            <g id="schematic-root"></g>
+            <!-- Snap cursor: shown while wire tool active -->
+            <g id="snap-cursor" style="display:none; pointer-events:none">
+              <circle id="snap-dot"  r="5" fill="none" stroke="#34D399" stroke-width="1.5" opacity="0.9"/>
+              <line id="snap-hline" x1="-10" y1="0" x2="10" y2="0" stroke="#34D399" stroke-width="0.8" opacity="0.6"/>
+              <line id="snap-vline" x1="0" y1="-10" x2="0" y2="10" stroke="#34D399" stroke-width="0.8" opacity="0.6"/>
+            </g>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Nets / SPICE overlay panel (slides up from bottom) -->
+      <div id="overlay-panel" class="hidden">
+        <div class="overlay-header">
+          <div class="overlay-tabs">
+            <button class="otab active" data-otab="nets">Net List</button>
+            <button class="otab" data-otab="spice">SPICE Netlist</button>
+          </div>
+          <div style="display:flex;gap:6px;align-items:center">
+            <button class="small-btn" id="btn-copy-overlay">Copy</button>
+            <button class="small-btn" id="btn-close-overlay">✕</button>
+          </div>
+        </div>
+        <div class="overlay-body">
+          <div class="otab-content active" id="otab-nets">
+            <div id="net-list-content"></div>
+          </div>
+          <div class="otab-content" id="otab-spice">
+            <pre id="spice-output"></pre>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Status Bar ── -->
+  <div id="statusbar">
+    <span id="status-msg">Ready — load an example, drag a component, or type DSL</span>
+    <span class="spacer"></span>
+    <span id="net-summary" class="meta-info"></span>
+    <span id="selected-info" class="meta-info"></span>
+    <span class="meta-info">ElectroDSL v2.0</span>
+  </div>
+
+</div>
+
+<!-- ══ Symbol Import / Create Modal ══ -->
+<div id="modal-overlay" class="hidden">
+  <div id="modal-box">
+    <div class="modal-header">
+      <span id="modal-title">Import / Create Symbol</span>
+      <button class="modal-close" id="modal-close-btn">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-tabs">
+        <button class="mtab active" data-mtab="import">Import JSON</button>
+        <button class="mtab" data-mtab="create">Create New</button>
+      </div>
+
+      <!-- Import tab -->
+      <div class="mtab-content active" id="mtab-import">
+        <p class="modal-hint">Browse a <code>.json</code> file, paste JSON below, or drag a file onto the text area.</p>
+        <div class="import-browse-row">
+          <button class="modal-btn browse-btn" id="btn-browse-json">
+            <svg width="13" height="13" viewBox="0 0 16 16" fill="none"><path d="M2 4.5A1.5 1.5 0 0 1 3.5 3h3l2 2h4A1.5 1.5 0 0 1 14 6.5v6A1.5 1.5 0 0 1 12.5 14h-9A1.5 1.5 0 0 1 2 12.5v-8z" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+            Browse JSON File…
+          </button>
+          <span id="browse-filename" class="browse-filename"></span>
+          <input type="file" id="modal-file-input" accept=".json,application/json" style="display:none"/>
+        </div>
+        <textarea id="import-json-text" placeholder='{
+  "id": "MyIC",
+  "name": "My Custom IC",
+  "category": "Custom",
+  "description": "Custom IC description",
+  "manufacturer": "Manufacturer",
+  "defaultParams": "SN74HC00",
+  "defaultValue": "SN74HC00",
+  "color": "#60A5FA",
+  "pins": [
+    { "num": 1, "name": "A", "x": -30, "y": -15 },
+    { "num": 2, "name": "B", "x": -30, "y":   0 },
+    { "num": 3, "name": "Y", "x":  30, "y": -10 },
+    { "num": 4, "name": "GND","x":  0, "y":  20 },
+    { "num": 5, "name": "VCC","x":  0, "y": -20 }
+  ],
+  "svgBody": ""
+}'></textarea>
+        <div id="import-error" class="modal-error hidden"></div>
+        <button class="modal-btn primary" id="btn-do-import">Import Symbol</button>
+      </div>
+
+      <!-- Create tab -->
+      <div class="mtab-content" id="mtab-create">
+        <div class="create-form">
+          <div class="form-row">
+            <label>Type ID <span class="hint">(used in DSL code)</span></label>
+            <input id="cf-id" type="text" placeholder="MyIC" maxlength="20"/>
+          </div>
+          <div class="form-row">
+            <label>Display Name</label>
+            <input id="cf-name" type="text" placeholder="My IC"/>
+          </div>
+          <div class="form-row">
+            <label>Category</label>
+            <input id="cf-cat" type="text" placeholder="Custom" value="Custom"/>
+          </div>
+          <div class="form-row">
+            <label>Manufacturer</label>
+            <input id="cf-mfr" type="text" placeholder="Generic"/>
+          </div>
+          <div class="form-row">
+            <label>Default Params</label>
+            <input id="cf-params" type="text" placeholder="SN74HC00"/>
+          </div>
+          <div class="form-row">
+            <label>Color</label>
+            <input id="cf-color" type="color" value="#60A5FA"/>
+          </div>
+          <div class="form-row full">
+            <label>Pins <span class="hint">(one per line: num,name,x,y — e.g. 1,A,-30,-15)</span></label>
+            <textarea id="cf-pins" rows="5" placeholder="1,A,-30,-15&#10;2,B,-30,0&#10;3,Y,30,-10&#10;4,GND,0,20&#10;5,VCC,0,-20"></textarea>
+          </div>
+          <div class="form-row full">
+            <label>SVG Body <span class="hint">(optional — leave blank for auto-generated rectangle)</span></label>
+            <textarea id="cf-svg" rows="4" placeholder='&lt;rect x="-24" y="-18" width="48" height="36" rx="3" fill="#061318" stroke="#60A5FA" stroke-width="1.5"/&gt;'></textarea>
+          </div>
+        </div>
+        <div id="create-error" class="modal-error hidden"></div>
+        <button class="modal-btn primary" id="btn-do-create">Create Symbol</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- hidden file input for JSON import -->
+<input type="file" id="file-import-input" accept=".json" style="display:none"/>
+
+<!-- Autosave toast -->
+<div id="autosave-toast">
+  <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M3 8l4 4 6-6" stroke="#34D399" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+  Auto-saved
+</div>
+
+<script src="src/gridmanager.js"></script>
+<script src="src/symbols.js"></script>
+<script src="src/library.js"></script>
+<script src="src/filemanager.js"></script>
+<script src="src/parser.js"></script>
+<script src="src/netmanager.js"></script>
+<script src="src/renderer.js"></script>
+<script src="src/tools.js"></script>
+<script src="src/autolayout.js"></script>
+<script src="src/spice.js"></script>
+<script src="src/ai.js"></script>
+<script src="src/editor.js"></script>
+<script src="src/app.js"></script>
+</body>
+</html>
